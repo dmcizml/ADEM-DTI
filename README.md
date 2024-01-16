@@ -13,6 +13,8 @@
 
 ## Data description
 
+The dataset is available at https://drive.google.com/drive/folders/1gbX8_mDi9RT5c3wSG7kqJouwBOPMKvOR?usp=sharing
+
 - `drug.txt` : list of drug names.
 - `protein.txt` : list of protein names.
 - `disease.txt` : list of disease names.
