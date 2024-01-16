@@ -38,5 +38,7 @@ The dataset is available at https://drive.google.com/drive/folders/1gbX8_mDi9RT5
 # Quick start
 
 - python main.py
+- If you just want to use our model parameters to reproduce the results, you can directly run
+  python main.py --only_test True
 
 
