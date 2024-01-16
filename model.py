@@ -493,9 +493,9 @@ class MLP(nn.Module):
         return output
 
 
-class HMTCL(nn.Module):
+class ADEM(nn.Module):
     def __init__(self, args):
-        super(HMTCL, self).__init__()
+        super(ADEM, self).__init__()
         self.args = args
         self.ieHGCN_DTI = ieHGCN_DTI(args.num_layers, args.in_size, args.hidden_size, args.out_size, args.attn_size, args.ntypes, args.etypes, args.bias, args.batchnorm, args.dropout)
         
@@ -521,7 +521,7 @@ class HMTCL(nn.Module):
         
     def forward(self, graph, h, dateset_index, data, edge, iftrain=True, d=None, p=None):
         
-        if iftrain or self.args.only_test:
+        if iftrain:
             # get the drug and protein feature
             drug_hgnn, protein_hgnn = self.ieHGCN_DTI(graph, h)
             d = self.fusion(drug_hgnn)

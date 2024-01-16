@@ -13,7 +13,7 @@ class Logger(object):
     def __init__(self, fileN="Default.log"):
         self.terminal = sys.stdout
         self.log = open(fileN, "a")
-
+ 
     def write(self, message):
         self.terminal.write(message)
         self.terminal.flush()
@@ -51,21 +51,6 @@ def evaluate(model, d, p, test_index, graph, dtidata, label, node_feature, dpedg
         # forward
         out = model(graph, node_feature, test_index, dtidata, dpedge, iftrain=False, d=d, p=p)
         # evaluating metrics
-        test_acc = get_accscore(out, label[test_index])
-        test_auc = get_roc(out, label[test_index])
-        test_aupr = get_pr(out,label[test_index])      
-        test_f1 = get_f1score(out,label[test_index])     
-        test_precision = get_precisionscore(out,label[test_index])    
-        test_recall = get_recallscore(out,label[test_index])    
-        test_mcc = get_mccscore(out,label[test_index])
-    return test_acc, test_auc, test_aupr, test_f1, test_precision, test_recall, test_mcc
-
-def test(model, test_index, graph, dtidata, label, node_feature, dpedge):
-    model.eval()
-    with torch.no_grad():
-        # forward 
-        out = model(graph, node_feature, test_index, dtidata, dpedge, iftrain=False)
-        # testing metrics
         test_acc = get_accscore(out, label[test_index])
         test_auc = get_roc(out, label[test_index])
         test_aupr = get_pr(out,label[test_index])      
@@ -120,10 +105,11 @@ def run_model(args):
         test_index = test_indeces[i]
         
         # network    
-        model = HMTCL(args = args).to(args.device)  
+        model = ADEM(args = args).to(args.device)  
             
         optim = torch.optim.Adam(lr=args.lr, weight_decay=args.weight_decay, params=model.parameters())
         make_dir(args.save_dir + '/checkpoint')
+        make_dir(args.save_dir + '/bestfeature')
         
         best_acc = 0
         best_f1 = 0
@@ -134,12 +120,16 @@ def run_model(args):
         best_mcc = 0
         counter = 0
         best_weights = None
+        best_drug = None
+        best_protein = None
         
         # only_test
         if args.only_test:
             # load model parameters
             model.load_state_dict(torch.load(args.save_dir + '/checkpoint/checkpoint_fold_{}.pt'.format(i), map_location=args.device))
-            acc, auc, aupr, f1, precision, recall, mcc = test(model, test_index, graph, dtidata, label, node_feature, dpedge)
+            only_test_drug = torch.load(args.save_dir + '/bestfeature/bestdrug_fold_{}.txt'.format(i), map_location=args.device)
+            only_test_protein = torch.load(args.save_dir + '/bestfeature/bestprotein_fold_{}.txt'.format(i), map_location=args.device)
+            acc, auc, aupr, f1, precision, recall, mcc = evaluate(model, only_test_drug, only_test_protein, test_index, graph, dtidata, label, node_feature, dpedge)
             best_acc, best_auc, best_aupr, best_f1, best_precision, best_recall, best_mcc = acc, auc, aupr, f1, precision, recall, mcc 
         # Train and validation
         else:
@@ -161,6 +151,8 @@ def run_model(args):
                     best_mcc = mcc
                     counter = 0
                     best_weights = model.state_dict()
+                    best_drug = d
+                    best_protein = p
                     
                 else:
                     # Early stopping
@@ -174,7 +166,9 @@ def run_model(args):
                         continue
             # save best model parameters
             torch.save(best_weights, args.save_dir + '/checkpoint/checkpoint_fold_{}.pt'.format(i))
-             
+            torch.save(best_drug, args.save_dir + '/bestfeature/bestdrug_fold_{}.txt'.format(i))
+            torch.save(best_protein, args.save_dir + '/bestfeature/bestprotein_fold_{}.txt'.format(i))
+            
         all_acc.append(best_acc)
         all_auc.append(best_auc)
         all_f1.append(best_f1)
@@ -202,7 +196,7 @@ def run_model(args):
     
 def parser():
     ap = argparse.ArgumentParser(description='DTI testing for the recommendation dataset')
-    ap.add_argument('--device', default='cuda:0')
+    ap.add_argument('--device', default='cuda:1')
     ap.add_argument('--dataset', type=str, default='data_luo', help='Options: data_luo, data_qi, data_li.')
     ap.add_argument('--patience', type=int, default=100, help='Early stopping. Default is 100.')
     ap.add_argument('--num_layers', type=int, default=5, help='The number layers of model. Default is 5.')
@@ -225,7 +219,7 @@ def parser():
     ap.add_argument('--EarlyStopping', type=bool, default=False, help='Default is False.')
     ap.add_argument('--predictor', type=str, default='dpg', help='What method is used for prediction. Default is dpg(DP graph). Options: dpg, lin')
     ap.add_argument('--save_dir', type=str, default='./results_dpp/{}/repeat{}/gnn_type_{}/', help='Postfix for the saved model and result.')
-    ap.add_argument('--repeat', type=int, default=10, help='Repeat the training and testing for N times. Default is 1.')
+    ap.add_argument('--repeat', type=int, default=1, help='Repeat the training and testing for N times. Default is 1.')
     args = ap.parse_args()
     return args
     
