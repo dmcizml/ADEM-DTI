@@ -127,8 +127,8 @@ def run_model(args):
         if args.only_test:
             # load model parameters
             model.load_state_dict(torch.load(args.save_dir + '/checkpoint/checkpoint_fold_{}.pt'.format(i), map_location=args.device))
-            only_test_drug = torch.load(args.save_dir + '/bestfeature/bestdrug_fold_{}.txt'.format(i), map_location=args.device)
-            only_test_protein = torch.load(args.save_dir + '/bestfeature/bestprotein_fold_{}.txt'.format(i), map_location=args.device)
+            only_test_drug = torch.load(args.save_dir + '/bestfeature/bestdrug_fold_{}.pth'.format(i), map_location=args.device)
+            only_test_protein = torch.load(args.save_dir + '/bestfeature/bestprotein_fold_{}.pth'.format(i), map_location=args.device)
             acc, auc, aupr, f1, precision, recall, mcc = evaluate(model, only_test_drug, only_test_protein, test_index, graph, dtidata, label, node_feature, dpedge)
             best_acc, best_auc, best_aupr, best_f1, best_precision, best_recall, best_mcc = acc, auc, aupr, f1, precision, recall, mcc 
         # Train and validation
@@ -166,8 +166,8 @@ def run_model(args):
                         continue
             # save best model parameters
             torch.save(best_weights, args.save_dir + '/checkpoint/checkpoint_fold_{}.pt'.format(i))
-            torch.save(best_drug, args.save_dir + '/bestfeature/bestdrug_fold_{}.txt'.format(i))
-            torch.save(best_protein, args.save_dir + '/bestfeature/bestprotein_fold_{}.txt'.format(i))
+            torch.save(best_drug, args.save_dir + '/bestfeature/bestdrug_fold_{}.pth'.format(i))
+            torch.save(best_protein, args.save_dir + '/bestfeature/bestprotein_fold_{}.pth'.format(i))
             
         all_acc.append(best_acc)
         all_auc.append(best_auc)
