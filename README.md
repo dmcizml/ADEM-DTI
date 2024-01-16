@@ -24,11 +24,12 @@
 - `mat_protein_disease.txt` : Protein-Disease association matrix.
 - `mat_protein_drug.txt` : Protein-Drug interaction matrix.
 - `mat_drug_protein.txt` : Drug-Protein interaction matrix.
-- `Similarity_Matrix_Drugs.txt` : Drug similarity scores based on chemical structures of drugs
-- `Similarity_Matrix_Proteins.txt` : Protein similarity scores based on primary sequences of proteins
-- `mat_drug_protein_homo_protein_drug.txt` : Drug-Protein interaction matrix, in which DTIs with similar drugs (i.e., drug chemical structure similarities > 0.6) or similar proteins (i.e., protein sequence similarities > 40%) were removed (see the paper).
-- `mat_drug_protein_drug.txt` : Drug-Protein interaction matrix, in which DTIs with drugs sharing similar drug interactions (i.e., Jaccard similarities > 0.6) were removed (see the paper).
-- `mat_drug_protein_disease.txt` : Drug-Protein interaction matrix, in which DTIs with drugs or proteins sharing similar diseases (i.e., Jaccard similarities > 0.6) were removed (see the paper).
+- `Similarity_Matrix_Drugs.txt` : Drug similarity scores based on chemical structures of drugs.
+- `Similarity_Matrix_Proteins.txt` : Protein similarity scores based on primary sequences of proteins.
+- `drug_triplet_representations.txt` : Pre-training drug features are used as the initialization features.
+- `protein_triplet_representations.txt` : Pre-training protein features are used as the initialization features.
+- `sideeffect_triplet_representations.txt` : Pre-training sideeffect features are used as the initialization features.
+- `disease_triplet_representations.txt` : Pre-training disease features are used as the initialization features.
 
 
 
